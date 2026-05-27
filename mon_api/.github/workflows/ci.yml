@@ -1,50 +1,51 @@
+---
 # CI/CD Pipeline for the API
 # This workflow runs on pushes to the main branch,
 # executes tests, and builds a Docker image if tests pass.
 
-name: CI/CD Pipeline  # Nom du pipeline affiché dans GitHub Actions
+name: CI/CD Pipeline   # Nom du pipeline affiché dans GitHub Actions
 
 on:
   push:
     branches:
-      - main  # Le pipeline se déclenche automatiquement quand on push sur la branche main
+      - main   # Trigger on push to main
 
 jobs:
   # -------------------------------------------------
   # Tests job
   # -------------------------------------------------
   test:
-    runs-on: ubuntu-latest  # Machine virtuelle Linux utilisée pour exécuter le pipeline
+    runs-on: ubuntu-latest   # VM Linux
     steps:
-      # Récupère le code source du repository
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Installe Python sur la machine virtuelle
+      # Setup Python
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      # Installe les dépendances Python (Flask, pytest, etc.)
+      # Install dependencies
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # Lance les tests unitaires pour vérifier que le code fonctionne
+      # Run tests
       - name: Run tests
         run: python -m pytest
 
   # -------------------------------------------------
-  # Docker build job (runs after successful tests)
+  # Docker build job (runs after tests)
   # -------------------------------------------------
   docker:
-    needs: test  # Ce job ne se lance QUE si les tests passent
+    needs: test   # Runs only if tests pass
     runs-on: ubuntu-latest
     steps:
-      # Récupère à nouveau le code source
+      # Checkout code again
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Construit une image Docker à partir du Dockerfile
+      # Build Docker image
       - name: Build Docker image
         run: docker build -t api-test .
